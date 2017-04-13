@@ -1,0 +1,24 @@
+---
+version: "2"
+services:
+  tvheadend:
+    image: cahna/tvheadend
+    container_name: tvheadend
+    restart: always
+    devices:
+      - /dev/dvb  # Ensure this is chown'ed to something usable by 'hts' user within container
+    expose: [ 9981, 9982 ]
+    volumes_from:
+      - tvheadend_data
+    environment:
+      PGID: 9981
+      PUID: 9981
+
+  tvheadend_data:
+    image: cahna/tvheadend
+    container_name: tvheadend_data
+    entrypoint: chown -R hts:hts /config /recordings /dev/dvb
+    volumes:
+      - ./tvheadend/config:/config
+      - ./tvheadend/recordings:/recordings
+

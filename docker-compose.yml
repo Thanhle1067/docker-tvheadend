@@ -1,24 +1,20 @@
 ---
-version: "2"
+version: "2.1"
 services:
   tvheadend:
-    image: cahna/tvheadend
+    image: lscr.io/linuxserver/tvheadend
     container_name: tvheadend
-    restart: always
-    devices:
-      - /dev/dvb  # Ensure this is chown'ed to something usable by 'hts' user within container
-    expose: [ 9981, 9982 ]
-    volumes_from:
-      - tvheadend_data
     environment:
-      PGID: 9981
-      PUID: 9981
-
-  tvheadend_data:
-    image: cahna/tvheadend
-    container_name: tvheadend_data
-    entrypoint: chown -R hts:hts /config /recordings /dev/dvb
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Bangkok
     volumes:
-      - ./tvheadend/config:/config
-      - ./tvheadend/recordings:/recordings
-
+      - ./config:/config
+      - ./recordings:/recordings
+    ports:
+      - 9981:9981
+      - 9982:9982
+    devices:
+      - /dev/dri:/dev/dri #optional
+      - /dev/dvb:/dev/dvb #optional
+    restart: unless-stopped
